@@ -5,11 +5,15 @@ datasources:
     type: influxdb
     access: proxy
     url: http://influxdb:8086
+    uid: influxdb-datasource
     jsonData:
       version: Flux
       organization: speedmonitor
       defaultBucket: speedtest
       tlsSkipVerify: true
     secureJsonData:
-      token: $__env{INFLUXDB_TOKEN}
+      # Note: Token is hardcoded because Grafana provisioning doesn't support
+      # environment variable interpolation in secureJsonData fields
+      # This matches DOCKER_INFLUXDB_INIT_ADMIN_TOKEN in .env
+      token: speedmonitor-admin-token
     isDefault: true

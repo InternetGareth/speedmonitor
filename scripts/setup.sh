@@ -49,16 +49,25 @@ sleep 30
 if docker-compose ps | grep -q "Up"; then
     echo "Services are running!"
     echo ""
-    echo "Access your dashboards:"
-    echo "   Grafana Dashboard: http://localhost:3000"
-    echo "   InfluxDB UI: http://localhost:8086"
-    echo ""
-    echo "Default credentials:"
-    echo "   Grafana: admin / speedmonitor-grafana"
-    echo "   InfluxDB: admin / speedmonitor-admin"
-    echo ""
-    echo "To view logs: docker-compose logs -f"
-    echo "To stop: docker-compose down"
+    echo "Validating setup..."
+    ./scripts/validate-setup.sh
+    
+    if [ $? -eq 0 ]; then
+        echo ""
+        echo "Access your dashboards:"
+        echo "   Grafana Dashboard: http://localhost:3000"
+        echo "   InfluxDB UI: http://localhost:8086"
+        echo ""
+        echo "Default credentials:"
+        echo "   Grafana: admin / speedmonitor-grafana"
+        echo "   InfluxDB: admin / speedmonitor-admin"
+        echo ""
+        echo "To view logs: docker-compose logs -f"
+        echo "To stop: docker-compose down"
+    else
+        echo "Setup validation failed. Check logs with: docker-compose logs"
+        exit 1
+    fi
 else
     echo "ERROR: Some services failed to start. Check logs with: docker-compose logs"
     exit 1
