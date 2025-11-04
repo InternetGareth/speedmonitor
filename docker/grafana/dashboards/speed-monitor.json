@@ -1,5 +1,6 @@
 {
     "id": null,
+    "uid": "speedmonitor-dashboard",
     "title": "Internet Speed Monitor",
     "tags": ["speedtest", "internet", "monitoring"],
     "timezone": "browser",

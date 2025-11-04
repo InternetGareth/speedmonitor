@@ -55,7 +55,8 @@ if docker-compose ps | grep -q "Up"; then
     if [ $? -eq 0 ]; then
         echo ""
         echo "Access your dashboards:"
-        echo "   Grafana Dashboard: http://localhost:3000"
+        echo "   Speed Monitor Dashboard: http://localhost:3000/d/speedmonitor-dashboard/internet-speed-monitor"
+        echo "   Grafana Home: http://localhost:3000"
         echo "   InfluxDB UI: http://localhost:8086"
         echo ""
         echo "Default credentials:"
