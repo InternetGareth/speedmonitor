@@ -80,6 +80,47 @@ uv add --dev pytest pytest-cov black ruff mypy
 4. **Track progress**: Update the Progress Tracking section below after each step
 5. **Wait for approval**: Present completed work and wait for user testing/approval
 
+### Agent Usage (REQUIRED)
+You MUST use specialized agents at the appropriate stages of development. Do NOT handle everything directly.
+
+**When to Use Agents:**
+
+1. **Explore Agent** - Use for codebase exploration tasks:
+   - Understanding project structure
+   - Finding where functionality is implemented
+   - Searching for patterns across multiple files
+   - Any open-ended exploration requiring multiple searches
+   - Specify thoroughness: "quick", "medium", or "very thorough"
+
+   Example: "Use Explore agent (medium) to understand how error handling works"
+
+2. **test-engineer Agent** - Use IMMEDIATELY after implementing new code:
+   - After writing any new class, function, or service
+   - When adding new features or functionality
+   - Before marking implementation steps as complete
+   - For validating edge cases and error handling
+
+   Example: "After implementing SpeedTestService, launch test-engineer to write and run comprehensive unit tests"
+
+3. **code-reviewer Agent** - Use PROACTIVELY after completing logical chunks:
+   - After implementing a complete feature or service
+   - After tests pass for a component
+   - Before moving to the next major implementation step
+   - To get feedback on code quality and best practices
+
+   Example: "After core implementation and passing tests, launch code-reviewer for expert feedback"
+
+**Agent Workflow Pattern:**
+```
+Implement Code → test-engineer (write/run tests) → code-reviewer (quality check) → Next Step
+```
+
+**IMPORTANT:**
+- Launch agents using the Task tool with the appropriate subagent_type
+- Do NOT skip agents to "save time" - they improve quality significantly
+- Use agents in parallel when possible (single message with multiple Task calls)
+- Always specify what information the agent should return in its final report
+
 ### Testing Requirements
 - Work within UV environment (`source .venv/bin/activate`)
 - Unit tests required for all components
