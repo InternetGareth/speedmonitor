@@ -39,14 +39,15 @@ fi
 
 # Test Grafana datasource
 echo "Testing Grafana datasource..."
-DATASOURCE_TEST=$(curl -s -X POST "http://localhost:3000/api/datasources/uid/influxdb-datasource/health" \
+DATASOURCE_RESPONSE=$(curl -s -X POST "http://localhost:3000/api/datasources/uid/influxdb-datasource/health" \
   -H "Authorization: Basic $(echo -n 'admin:speedmonitor-grafana' | base64)" \
-  -H "Content-Type: application/json" | jq -r '.status')
+  -H "Content-Type: application/json")
 
-if [ "$DATASOURCE_TEST" = "OK" ]; then
+if echo "$DATASOURCE_RESPONSE" | grep -q '"status":"OK"'; then
     echo "✅ Grafana datasource is working"
 else
     echo "❌ Grafana datasource connection failed"
+    echo "Response: $DATASOURCE_RESPONSE"
     exit 1
 fi
 
