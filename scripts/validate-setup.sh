@@ -51,6 +51,38 @@ else
     exit 1
 fi
 
+# Test speed test functionality
+echo "Testing speed test functionality..."
+SPEEDTEST_RESULT=$(docker compose exec -T speedmonitor python -c "
+import speedtest
+import sys
+
+try:
+    st = speedtest.Speedtest()
+    best = st.get_best_server()
+    st.download()
+    st.upload()
+    print(f'OK|{best[\"sponsor\"]}|{best[\"name\"]}|{best[\"country\"]}|{best[\"id\"]}')
+    sys.exit(0)
+except Exception as e:
+    print(f'ERROR|{str(e)}')
+    sys.exit(1)
+" 2>&1)
+
+if echo "$SPEEDTEST_RESULT" | grep -q "^OK|"; then
+    SERVER_INFO=$(echo "$SPEEDTEST_RESULT" | grep "^OK|" | cut -d'|' -f2-)
+    SPONSOR=$(echo "$SERVER_INFO" | cut -d'|' -f1)
+    LOCATION=$(echo "$SERVER_INFO" | cut -d'|' -f2)
+    COUNTRY=$(echo "$SERVER_INFO" | cut -d'|' -f3)
+    SERVER_ID=$(echo "$SERVER_INFO" | cut -d'|' -f4)
+    echo "✅ Speed test is working (using $SPONSOR in $LOCATION, $COUNTRY - ID: $SERVER_ID)"
+else
+    echo "⚠️  Speed test failed: $(echo "$SPEEDTEST_RESULT" | grep "^ERROR|" | cut -d'|' -f2-)"
+    echo "   Services are running but speed tests may not work"
+    echo "   Check: docker compose logs speedmonitor"
+    echo ""
+fi
+
 echo ""
 echo "🎉 All services are working correctly!"
 
