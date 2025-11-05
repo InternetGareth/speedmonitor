@@ -53,4 +53,16 @@ fi
 
 echo ""
 echo "🎉 All services are working correctly!"
-echo "Access your dashboard at: http://localhost:3000"
+
+# Detect local IP address
+LOCAL_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+if [ -z "$LOCAL_IP" ]; then
+    # Fallback for macOS or systems without hostname -I
+    LOCAL_IP=$(ifconfig 2>/dev/null | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | head -n 1)
+fi
+
+if [ -n "$LOCAL_IP" ]; then
+    echo "Access your dashboard at: http://${LOCAL_IP}:3000/d/speedmonitor-dashboard/internet-speed-monitor"
+else
+    echo "Access your dashboard at: http://localhost:3000/d/speedmonitor-dashboard/internet-speed-monitor"
+fi

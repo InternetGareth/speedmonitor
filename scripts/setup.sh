@@ -60,11 +60,26 @@ if $COMPOSE_CMD ps | grep -q "Up"; then
     ./scripts/validate-setup.sh
 
     if [ $? -eq 0 ]; then
+        # Detect local IP address
+        LOCAL_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+        if [ -z "$LOCAL_IP" ]; then
+            # Fallback for macOS or systems without hostname -I
+            LOCAL_IP=$(ifconfig 2>/dev/null | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | head -n 1)
+        fi
+
         echo ""
         echo "Access your dashboards:"
-        echo "   Speed Monitor Dashboard: http://localhost:3000/d/speedmonitor-dashboard/internet-speed-monitor"
-        echo "   Grafana Home: http://localhost:3000"
-        echo "   InfluxDB UI: http://localhost:8086"
+        if [ -n "$LOCAL_IP" ]; then
+            echo "   Speed Monitor Dashboard: http://${LOCAL_IP}:3000/d/speedmonitor-dashboard/internet-speed-monitor"
+            echo "   Grafana Home: http://${LOCAL_IP}:3000"
+            echo "   InfluxDB UI: http://${LOCAL_IP}:8086"
+            echo ""
+            echo "   (Or from this machine: http://localhost:3000/d/speedmonitor-dashboard/internet-speed-monitor)"
+        else
+            echo "   Speed Monitor Dashboard: http://localhost:3000/d/speedmonitor-dashboard/internet-speed-monitor"
+            echo "   Grafana Home: http://localhost:3000"
+            echo "   InfluxDB UI: http://localhost:8086"
+        fi
         echo ""
         echo "Default credentials:"
         echo "   Grafana: admin / speedmonitor-grafana"
