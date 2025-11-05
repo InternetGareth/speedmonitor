@@ -26,9 +26,11 @@ A self-hosted internet speed monitoring service for Raspberry Pi that continuous
 
 ## Requirements
 
-- Docker and Docker Compose
+- Docker and Docker Compose V2 (V1 supported but deprecated)
 - 2GB+ RAM (recommended for Raspberry Pi 4)
 - Internet connection for speed tests
+
+**Note**: This project uses Docker Compose V2 (`docker compose` command). The setup scripts will automatically detect and use V1 (`docker-compose`) if V2 is not available, but upgrading to V2 is recommended.
 
 ## Configuration
 
@@ -83,9 +85,9 @@ speedmonitor/
 
 ## Monitoring
 
-- **View logs**: `docker-compose logs -f speedmonitor`
-- **Service status**: `docker-compose ps`
-- **Restart service**: `docker-compose restart speedmonitor`
+- **View logs**: `docker compose logs -f speedmonitor`
+- **Service status**: `docker compose ps`
+- **Restart service**: `docker compose restart speedmonitor`
 
 ## Troubleshooting
 
@@ -99,13 +101,13 @@ speedmonitor/
 
 ```bash
 # View application logs
-docker-compose logs -f speedmonitor
+docker compose logs -f speedmonitor
 
 # Restart all services
-docker-compose restart
+docker compose restart
 
 # Reset everything (WARNING: deletes data)
-docker-compose down -v
+docker compose down -v
 ```
 
 ## License

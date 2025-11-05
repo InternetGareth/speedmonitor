@@ -4,14 +4,21 @@ set -e
 
 echo "Starting Speed Monitor Setup..."
 
-# Check if Docker and Docker Compose are installed
+# Check if Docker is installed
 if ! command -v docker &> /dev/null; then
     echo "ERROR: Docker is not installed. Please install Docker first."
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
-    echo "ERROR: Docker Compose is not installed. Please install Docker Compose first."
+# Detect which Docker Compose command to use (V2 preferred, V1 fallback)
+if docker compose version &> /dev/null; then
+    COMPOSE_CMD="docker compose"
+elif command -v docker-compose &> /dev/null; then
+    COMPOSE_CMD="docker-compose"
+    echo "WARNING: Using deprecated docker-compose V1. Please upgrade to Docker Compose V2."
+else
+    echo "ERROR: Docker Compose is not installed. Please install Docker Compose V2."
+    echo "Visit: https://docs.docker.com/compose/install/"
     exit 1
 fi
 
@@ -27,31 +34,31 @@ fi
 
 # Stop any existing containers
 echo "Stopping any existing containers..."
-docker-compose down || true
+$COMPOSE_CMD down || true
 
 # Pull latest images
 echo "Pulling latest images..."
-docker-compose pull
+$COMPOSE_CMD pull
 
 # Build the speed monitor application
 echo "Building Speed Monitor application..."
-docker-compose build speedmonitor
+$COMPOSE_CMD build speedmonitor
 
 # Start the services
 echo "Starting services..."
-docker-compose up -d
+$COMPOSE_CMD up -d
 
 # Wait for services to be healthy
 echo "Waiting for services to start..."
 sleep 30
 
 # Check if services are running
-if docker-compose ps | grep -q "Up"; then
+if $COMPOSE_CMD ps | grep -q "Up"; then
     echo "Services are running!"
     echo ""
     echo "Validating setup..."
     ./scripts/validate-setup.sh
-    
+
     if [ $? -eq 0 ]; then
         echo ""
         echo "Access your dashboards:"
@@ -63,13 +70,13 @@ if docker-compose ps | grep -q "Up"; then
         echo "   Grafana: admin / speedmonitor-grafana"
         echo "   InfluxDB: admin / speedmonitor-admin"
         echo ""
-        echo "To view logs: docker-compose logs -f"
-        echo "To stop: docker-compose down"
+        echo "To view logs: docker compose logs -f"
+        echo "To stop: docker compose down"
     else
-        echo "Setup validation failed. Check logs with: docker-compose logs"
+        echo "Setup validation failed. Check logs with: docker compose logs"
         exit 1
     fi
 else
-    echo "ERROR: Some services failed to start. Check logs with: docker-compose logs"
+    echo "ERROR: Some services failed to start. Check logs with: docker compose logs"
     exit 1
 fi
