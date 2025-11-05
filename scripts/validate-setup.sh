@@ -2,8 +2,9 @@
 
 echo "Validating Speed Monitor setup..."
 
-# Wait for services
-sleep 15
+# Wait for services (longer for Raspberry Pi)
+echo "Waiting for services to initialize..."
+sleep 30
 
 # Test InfluxDB
 echo "Testing InfluxDB connection..."
@@ -14,12 +15,25 @@ else
     exit 1
 fi
 
-# Test Grafana
+# Test Grafana with retry logic (can take longer to start on Pi)
 echo "Testing Grafana connection..."
-if curl -sf "http://localhost:3000/api/health" > /dev/null; then
+GRAFANA_READY=false
+for i in {1..10}; do
+    if curl -sf "http://localhost:3000/api/health" > /dev/null; then
+        GRAFANA_READY=true
+        break
+    fi
+    if [ $i -lt 10 ]; then
+        echo "  Grafana not ready yet, waiting... (attempt $i/10)"
+        sleep 5
+    fi
+done
+
+if [ "$GRAFANA_READY" = true ]; then
     echo "✅ Grafana is healthy"
 else
-    echo "❌ Grafana connection failed"
+    echo "❌ Grafana connection failed after 50 seconds"
+    echo "Try: docker compose logs grafana"
     exit 1
 fi
 
